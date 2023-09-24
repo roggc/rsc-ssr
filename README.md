@@ -8,7 +8,7 @@ With this setup you can build SPA's with React and hide secret keys to fetch an 
 
 1. **npm i**
 2. **npm run dev**
-3. **npm run app** (in a new terminal window)
+3. **npm start** (in a new terminal window)
 4. enter **localhost:8080** in the browser.
 
 ## Instructions on how to develop with this setup
