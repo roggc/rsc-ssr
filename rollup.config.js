@@ -9,7 +9,7 @@ import alias from "@rollup/plugin-alias";
 import image from "@rollup/plugin-image";
 
 const distInputEntries = {
-  app: "src/server/app.js",
+  index: "src/server/index.js",
   router: "src/server/components/router.js",
 };
 
