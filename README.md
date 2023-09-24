@@ -1,6 +1,6 @@
 # RSC + SSR
 
-This is a setup for development with RSC (React Server Components) with SSR (Server Side Rendering). There is another setup to develop with RSC but without SSR, can be found [here](https://github.com/roggc/rsc).
+This is a setup for development with RSC (React Server Components) plus SSR (Server Side Rendering). There is another setup to develop with RSC but without SSR, can be found [here](https://github.com/roggc/rsc).
 
 With this setup you can build SPA's with React and hide secret keys to fetch an API in the server or fetch a database with Prisma in the server. It's a fullstack setup with React.
 
@@ -18,13 +18,16 @@ React.Suspense is not implemented in this setup, so don't use it. But in theory 
 This is the code for the `RSC` RCC:
 
 ```javascript
+import React, { useEffect, useState } from "react";
+import { fillJSXWithClientComponents, parseJSX } from "../utils/index.js";
+
 export default function RSC({
   componentName,
   children = <>loading ...</>,
   errorJSX = <>something went wrong</>,
   ...props
 }) {
-  const [JSX, setJSX] = React.useState(children);
+  const [JSX, setJSX] = useState(children);
   const body = JSON.stringify({ props });
 
   useEffect(() => {
@@ -37,7 +40,7 @@ export default function RSC({
       .then(async (response) => {
         const clientJSXString = await response.text();
         const clientJSX = JSON.parse(clientJSXString, parseJSX);
-        const fixedClientJSX = await fillJSXwithClientComponents(clientJSX);
+        const fixedClientJSX = await fillJSXWithClientComponents(clientJSX);
         setJSX(fixedClientJSX);
       })
       .catch(() => setJSX(errorJSX));
@@ -50,9 +53,16 @@ export default function RSC({
 So you see, this RCC calls the server to fetch for an RSC. This is the code for the `Router` RSC, the one which receives the call and handles it:
 
 ```javascript
+import React from "react";
+import theme from "../../client/theme.js";
+import RCC from "./rcc.js";
+import Greeting from "./greeting.js";
+
+const title = "My app";
+
 export default async function Router({ url, body: { props } }) {
-  switch (url.pathname) {
-    case "/":
+  switch (url.pathname.slice(1)) {
+    case "":
       return (
         <RCC __isClient__="../components/theme-provider.js" theme={theme}>
           <RCC __isClient__="../slices.js">
@@ -60,55 +70,105 @@ export default async function Router({ url, body: { props } }) {
           </RCC>
         </RCC>
       );
-    case "/home":
-      return <HomeRSC {...props} />;
+    case "greeting":
+      return <Greeting {...props} />;
     default:
       return <RCC __isClient__="../components/ups.js" />;
   }
 }
 ```
 
-So you see, when it is not first load it returns an RSC (`HomeRSC`). This RSC will return the final RCC. Let's see the definition for `HomeRSC`:
+So you see, when it is not first load it returns an RSC (`Greeting`). This RSC will return the final RCC. Let's see the definition for `Greeting` RSC:
 
 ```javascript
-export default async function HomeRSC() {
-  // you probably want to fetch some data in here
-  return <RCC __isClient__="../components/home.js" />;
+import React from "react";
+import RCC from "./rcc";
+
+export default async function Greeting() {
+  const value = Math.random() < 0.5;
+  const greeting = await new Promise((r) =>
+    setTimeout(() => {
+      switch (value) {
+        case true:
+          return r("Whatsupp!!!");
+        case false:
+          return r("How r u doing?");
+      }
+    }, 500)
+  );
+
+  return <RCC greeting={greeting} __isClient__="../components/greeting.js" />;
 }
 ```
 
-It just returns `RCC` RSC with the `__isClient__` prop set to where the file for `Home` RCC can be found relative to the utility function `fillJSXwithClientComponents`. And this is the `Layout` RCC:
+It just returns `RCC` RSC with the `__isClient__` prop set to where the file for `Greeting` RCC can be found relative to the utility function `fillJSXwithClientComponents`. And this is the `Layout` RCC:
 
 ```javascript
-export default function Layout({ title }) {
-  const page = useNavigation();
+import React from "react";
+import App from "./app";
 
+export default function Layout({ title }) {
   return (
     <html>
       <head>
         <title>{title}</title>
       </head>
-      <Body>
-        <Nav>
-          <Link page={{ name: "home" }}>home</Link>
-          <Link page={{ name: "foo" }}>foo</Link>
-        </Nav>
-        <Container>
-          <RSC key={page.name} componentName={page.name} {...page.props}>
-            loading {page.name} page...
-          </RSC>
-        </Container>
-      </Body>
+      <body>
+        <App />
+      </body>
     </html>
   );
 }
 ```
 
-You see how the `Layout` RCC doesn't call directly to `Home` RCC, but it calls instead to `RSC` RCC, which will fetch JSX for `HomeRSC`, wich will return JSX for `Home` RCC with proper data from the server.
+And the `App` RCC:
+
+```javascript
+import React, { useState } from "react";
+// ...
+import RSC from "./rsc";
+// ...
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  // ...
+
+  return (
+    <Container>
+      <Title>RSC + SSR</Title>
+      <Image src={imgReact} maxWidth="600px" borderRadius="10px" />
+      <Div>
+        {" "}
+        <button onClick={() => setCount((c) => c + 1)}>
+          get Greeting of the Day (from server)
+        </button>
+        {count > 0 && (
+          <RSC componentName="greeting" key={count}>
+            loading greeting ...
+          </RSC>
+        )}
+      </Div>
+      {/*...*/}
+    </Container>
+  );
+}
+
+// ...
+```
+
+The important part is here:
+
+```javascript
+<RSC componentName="greeting" key={count}>
+  loading greeting ...
+</RSC>
+```
+
+You see how the `App` RCC doesn't call directly to `Greeting` RCC, but it calls instead to `RSC` RCC, which will fetch JSX for `Greeting` RSC, wich will return JSX for `Greeting` RCC with proper data from the server.
 
 So this is the cycle:
 
-From an RCC call to `RSC` RCC passing to it the name of the RSC component we want to fetch (usually `some-component-name`). Then in the `Router` RSC the `SomeComponentNameRSC` is called which fetchs some data and returns `RCC` RSC pointing to `SomeComponentName` RCC with proper data, that gets rendered in the Client.
+From an RCC call to `RSC` RCC passing to it the name of the RSC component we want to fetch (usually `some-component-name`). Then in the `Router` RSC the `SomeComponentName` RSC is called which fetchs some data and returns `RCC` RSC pointing to `SomeComponentName` RCC with proper data, that gets rendered in the Client.
 
 `RCC` RSC is a RSC that does nothing. Next is its definition:
 
@@ -131,7 +191,8 @@ export default function SayHello({ greeting }) {
 This `greeting` prop must be given by the server. So we create an RSC that do the job:
 
 ```javascript
-export default async function SayHelloRSC({ name }) {
+// I am a RSC
+export default async function SayHello({ name }) {
   const greeting = await new Promise((r) =>
     setTimeout(() => {
       switch (name) {
@@ -146,24 +207,23 @@ export default async function SayHelloRSC({ name }) {
 }
 ```
 
-You see how `SayHelloRSC` RSC returns a call to `RCC` RSC with the `__isClient__` prop storing the relative path with respect to the utility function `fillJSXwithClientComponents` where the RCC can be found, and passing also a prop to this RCC which is `greeting` (the data fetched by the `SayHelloRSC` RSC). The `__isClient__` prop is only used by the server and it is not passed down to the `SayHello` RCC, as `greeting` or any other prop is (is a special prop used by this implementation).
+You see how `SayHello` RSC returns a call to `RCC` RSC with the `__isClient__` prop storing the relative path with respect to the utility function `fillJSXwithClientComponents` where the RCC can be found, and passing also a prop to this RCC which is `greeting` (the data fetched by the `SayHello` RSC). The `__isClient__` prop is only used by the server and it is not passed down to the `SayHello` RCC, as `greeting` or any other prop is (is a special prop used by this implementation).
 
 Now we must add the switch case in the `Router` RSC:
 
 ```javascript
 export default async function Router({ url, body: { props } }) {
   switch (url.pathname.slice(1)) {
-    case "home":
-      return <HomeRSC {...props} />;
+    // ...
     case "say-hello":
-      return <SayHelloRSC {...props} />;
+      return <SayHello {...props} />;
     default:
       return <RCC __isClient__="../components/ups.js" />;
   }
 }
 ```
 
-Last step is to 'call' `SayHelloRSC` from a RCC in the Client. This is done through special RCC named `RSC`, like this:
+Last step is to 'call' `SayHello` RSC from a RCC in the Client. This is done through special RCC named `RSC`, like this:
 
 ```javascript
 export default function SomeRCC() {
@@ -174,12 +234,13 @@ export default function SomeRCC() {
       <RSC componentName="say-hello" name="Roger">
         loading ...
       </RSC>
+      {/* ... */}
     </>
   );
 }
 ```
 
-So the `name` prop passed to `RSC` RCC goes to the server and ends up in `SayHelloRSC` RSC, which uses it to get an appropiate `greeting` for this `name`.
+So the `name` prop passed to `RSC` RCC goes to the server and ends up in `SayHello` RSC, which uses it to get an appropiate `greeting` for this `name`.
 
 Calls to `RSC` RCC can be nested, that is, `SayHello` RCC could also call to `RSC` RCC. In this case we have a waterfall effect (until first call is resolved, second nested call will not begin).
 
