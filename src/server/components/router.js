@@ -1,6 +1,6 @@
 import React from "react";
 import Greeting from "./greeting.js";
-import { RCC } from "../../../rsc-ssr/server/components/rcc.js";
+import { RCC } from "rsc-ssr-module/server";
 import theme from "../../client/theme.js";
 
 const title = "My App";

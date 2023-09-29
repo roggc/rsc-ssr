@@ -8,7 +8,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "rollup -c -w",
     "build": "rollup -c",
-    "start": "nodemon dist/index.js"
+    "start": "nodemon dist/index.mjs"
   },
   "keywords": [],
   "author": "",
@@ -32,6 +32,7 @@
     "react-dom": "^18.2.0",
     "rollup": "^3.29.4",
     "rollup-plugin-peer-deps-external": "^2.2.4",
+    "rsc-ssr-module": "file:../rsc-ssr.tgz",
     "styled-components": "^6.0.8"
   },
   "devDependencies": {

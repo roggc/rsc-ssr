@@ -14,6 +14,22 @@ const distInputEntries = {
 };
 
 export default [
+  // {
+  //   input: "rsc-ssr/client/index.js",
+  //   output: {
+  //     format: "esm",
+  //     file: "rsc-ssr-module/client.js",
+  //   },
+  //   plugins: [babel({ babelHelpers: "bundled", exclude: "node_modules/**" })],
+  // },
+  // {
+  //   input: "rsc-ssr/server/index.js",
+  //   output: {
+  //     format: "esm",
+  //     file: "rsc-ssr-module/server.js",
+  //   },
+  //   plugins: [babel({ babelHelpers: "bundled", exclude: "node_modules/**" })],
+  // },
   {
     input: (await globby("src/client/*.js"))
       .concat(await globby("src/client/components/*.js"))
@@ -28,17 +44,24 @@ export default [
       dir: "dist",
       format: "esm",
       preserveModules: true,
+      entryFileNames: "[name].mjs",
     },
     plugins: [
       babel({ babelHelpers: "bundled", exclude: "node_modules/**" }),
-      alias({
-        entries: [
-          {
-            find: "styled-components",
-            replacement:
-              "node_modules/styled-components/dist/styled-components.esm.js",
-          },
-        ],
+      // alias({
+      //   entries: [
+      //     {
+      //       find: "styled-components",
+      //       replacement:
+      //         "../../../node_modules/styled-components/dist/styled-components.esm.js",
+      //     },
+      //   ],
+      // }),
+      peerDepsExternal(),
+      nodeResolve({ resolveOnly: ["rsc-ssr-module", "styled-components"] }),
+      json(),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       }),
       image(),
     ],
