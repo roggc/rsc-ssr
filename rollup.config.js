@@ -28,6 +28,7 @@ export default [
       dir: "dist",
       format: "esm",
       preserveModules: true,
+      entryFileNames: "[name].mjs",
     },
     plugins: [
       babel({ babelHelpers: "bundled", exclude: "node_modules/**" }),
@@ -36,9 +37,15 @@ export default [
           {
             find: "styled-components",
             replacement:
-              "node_modules/styled-components/dist/styled-components.esm.js",
+              "../../../node_modules/styled-components/dist/styled-components.esm.js",
           },
         ],
+      }),
+      peerDepsExternal(),
+      nodeResolve({ resolveOnly: ["rsc-ssr-module"] }),
+      json(),
+      replace({
+        "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       }),
       image(),
     ],
