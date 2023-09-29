@@ -32,17 +32,17 @@ export default [
     },
     plugins: [
       babel({ babelHelpers: "bundled", exclude: "node_modules/**" }),
-      alias({
-        entries: [
-          {
-            find: "styled-components",
-            replacement:
-              "../../../node_modules/styled-components/dist/styled-components.esm.js",
-          },
-        ],
-      }),
+      // alias({
+      //   entries: [
+      //     {
+      //       find: "styled-components",
+      //       replacement:
+      //         "../../../node_modules/styled-components/dist/styled-components.esm.js",
+      //     },
+      //   ],
+      // }),
       peerDepsExternal(),
-      nodeResolve({ resolveOnly: ["rsc-ssr-module"] }),
+      nodeResolve({ resolveOnly: ["rsc-ssr-module", "styled-components"] }),
       json(),
       replace({
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
