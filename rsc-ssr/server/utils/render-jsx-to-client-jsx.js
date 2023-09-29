@@ -50,6 +50,19 @@ export async function renderJSXToClientJSX(jsx, key = null) {
             ),
             key: key ?? jsx.key,
           };
+        } else if (Object.keys(props).some((k) => k === "__isFramework__")) {
+          return {
+            ...jsx,
+            type: { file_: jsx.props.__isFramework__ },
+            props: await renderJSXToClientJSX(
+              Object.fromEntries(
+                Object.entries(jsx.props).filter(
+                  ([key]) => key !== "__isFramework__"
+                )
+              )
+            ),
+            key: key ?? jsx.key,
+          };
         } else {
           const returnedJsx = await Component(props);
           return await renderJSXToClientJSX(returnedJsx);

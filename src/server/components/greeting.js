@@ -1,5 +1,5 @@
 import React from "react";
-import RCC from "./rcc";
+import { RCC } from "../../../rsc-ssr/server/components/rcc.js";
 
 export default async function Greeting() {
   const value = Math.random() < 0.5;
@@ -14,5 +14,5 @@ export default async function Greeting() {
     }, 500)
   );
 
-  return <RCC greeting={greeting} __isClient__="../components/greeting.js" />;
+  return <RCC greeting={greeting} __isClient__="components/greeting" />;
 }

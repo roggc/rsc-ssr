@@ -1,15 +1,12 @@
 import React from "react";
-import App from "./app";
 
-export default function Layout({ title }) {
+export default function Layout({ title, children }) {
   return (
     <html>
       <head>
         <title>{title}</title>
       </head>
-      <body>
-        <App />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

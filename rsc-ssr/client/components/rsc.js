@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { fillJSXWithClientComponents, parseJSX } from "../utils/index.js";
 
-export default function RSC({
-  componentName,
+export function RSC({
+  componentName = "__no_component_name__",
   children = <>loading ...</>,
   errorJSX = <>something went wrong</>,
   ...props
