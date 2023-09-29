@@ -4,6 +4,8 @@ This is a setup for development with RSC (React Server Components) plus SSR (Ser
 
 With this setup you can build SPA's with React and hide secret keys to fetch an API in the server or fetch a database with Prisma in the server. It's a fullstack setup with React.
 
+A site informing about the setup can be found [here](https://rsc-setup.netlify.app).
+
 ## How to install and run the project.
 
 1. Type **_npm i_** in your terminal (this installs the dependencies and creates the `node_modules` folder)
