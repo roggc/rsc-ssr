@@ -8,7 +8,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "rollup -c -w",
     "build": "rollup -c",
-    "start": "nodemon dist/index.mjs"
+    "start": "nodemon dist/index.mjs",
+    "eject": "node ./eject.js"
   },
   "keywords": [],
   "author": "",
@@ -36,6 +37,8 @@
     "styled-components": "^6.0.8"
   },
   "devDependencies": {
+    "fast-glob": "^3.3.1",
+    "fs-extra": "^11.1.1",
     "nodemon": "^3.0.1"
   }
 }
