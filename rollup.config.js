@@ -14,6 +14,22 @@ const distInputEntries = {
 };
 
 export default [
+  // {
+  //   input: "rsc-ssr/client/index.js",
+  //   output: {
+  //     format: "esm",
+  //     file: "rsc-ssr-module/client.js",
+  //   },
+  //   plugins: [babel({ babelHelpers: "bundled", exclude: "node_modules/**" })],
+  // },
+  // {
+  //   input: "rsc-ssr/server/index.js",
+  //   output: {
+  //     format: "esm",
+  //     file: "rsc-ssr-module/server.js",
+  //   },
+  //   plugins: [babel({ babelHelpers: "bundled", exclude: "node_modules/**" })],
+  // },
   {
     input: (await globby("src/client/*.js"))
       .concat(await globby("src/client/components/*.js"))
