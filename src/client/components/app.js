@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import imgReact from "../assets/react.png";
 import Image from "./image";
-import RSC from "./rsc";
+import { RSC } from "../../../rsc-ssr/client/components/rsc.js";
 import { useSlice } from "../slices";
 
 export default function App() {
@@ -71,7 +71,7 @@ const Div = styled.div`
 `;
 
 const Title = styled(Div)`
-  font-size: 2rem;
+  font-size: ${({ theme }) => theme.title.fontSize};
   font-weight: 700;
 `;
 

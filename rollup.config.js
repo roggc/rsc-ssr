@@ -20,13 +20,13 @@ export default [
       .reduce(
         (acc, entryFile) => ({
           ...acc,
-          [entryFile.replace(".js", "").replace("src/", "")]: entryFile,
+          [entryFile.replace(".js", "")]: entryFile,
         }),
         distInputEntries
       ),
     output: {
       dir: "dist",
-      format: "es",
+      format: "esm",
       preserveModules: true,
     },
     plugins: [
@@ -55,7 +55,7 @@ export default [
       ),
     output: {
       dir: "public",
-      format: "es",
+      format: "esm",
       entryFileNames: "[name].js",
       preserveModules: true,
     },
