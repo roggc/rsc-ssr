@@ -33,12 +33,10 @@
     "react-dom": "^18.2.0",
     "rollup": "^3.29.4",
     "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rsc-ssr-module": "^1.0.0",
+    "rsc-ssr-module": "^1.0.1",
     "styled-components": "^6.0.8"
   },
   "devDependencies": {
-    "fast-glob": "^3.3.1",
-    "fs-extra": "^11.1.1",
     "nodemon": "^3.0.1"
   }
 }
