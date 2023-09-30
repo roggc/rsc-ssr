@@ -6,10 +6,15 @@ With this setup you can build SPA's with React and hide secret keys to fetch an 
 
 A site informing about the setup can be found [here](https://rsc-setup.netlify.app).
 
+## How to create a project with this setup.
+
+1. Type **_npx create-rsc-app name-of-your-app --ssr_** in a terminal window.
+2. Type **_cd name-of-your-app_**.
+
 ## How to run the project for development.
 
-1. Type **_npm run dev_** in a terminal window (this runs rollup in watch mode and creates the `dist` and `public` folders)
-2. Type **_npm start_** in another terminal window (this will start the app)
+3. Type **_npm run dev_** (this runs rollup in watch mode and creates the `dist` and `public` folders).
+4. Type **_npm start_** in another terminal window (this will start the app).
 
 Then you can just go to your browser an enter **_localhost:8080_** to see the app. Changes to the code will automatically be updated, but you must to manually reload the app on the browser to see them. Also, if you create or delete files, you must restart the bundler, that is, stop it and run again **_npm run dev_**.
 
