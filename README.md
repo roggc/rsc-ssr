@@ -228,3 +228,9 @@ The call to `RSC` RCC from any RCC is like a barrier for the flow of props which
 ## React.Suspense not implemented
 
 React.Suspense is not implemented in this setup so don't use it (you will get an error or exception thrown). But in theory you don't need it, with the use of `RSC` RCC that fetches the server. If I am wrong about this point let me know.
+
+## You can eject the project
+
+There is a script to eject the project (**_npm run eject_**). This will copy the `src` folder of the `rsc-ssr-module` node module into the root of the project and update references in code to point to this new created folder. The project, after `eject`, will run as always, but now you have full control of the source code and can customize it to your specific needs.
+
+The `eject` process is reversible. You can delete the folder created and discard changes to the source code. It is recomendable for this reason before eject have all changes commited.
