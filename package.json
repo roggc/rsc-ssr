@@ -1,5 +1,5 @@
 {
-  "name": "rcs_ssr_app",
+  "name": "rsc_ssr_app",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,7 @@
     "dev": "rollup -c -w",
     "build": "rollup -c",
     "start": "nodemon dist/index.mjs",
-    "eject": "node ./eject.js"
+    "eject": "rsc-ssr-module"
   },
   "keywords": [],
   "author": "",
@@ -33,7 +33,7 @@
     "react-dom": "^18.2.0",
     "rollup": "^3.29.4",
     "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rsc-ssr-module": "^1.0.2",
+    "rsc-ssr-module": "^2.0.0",
     "styled-components": "^6.0.8"
   },
   "devDependencies": {
