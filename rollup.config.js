@@ -15,15 +15,13 @@ const distInputEntries = {
 
 export default [
   {
-    input: (await globby("src/client/*.js"))
-      .concat(await globby("src/client/components/*.js"))
-      .reduce(
-        (acc, entryFile) => ({
-          ...acc,
-          [entryFile.replace(".js", "")]: entryFile,
-        }),
-        distInputEntries
-      ),
+    input: (await globby("src/client/**/*.js")).reduce(
+      (acc, entryFile) => ({
+        ...acc,
+        [entryFile.replace(".js", "")]: entryFile,
+      }),
+      distInputEntries
+    ),
     output: {
       dir: "dist",
       format: "esm",
@@ -51,15 +49,13 @@ export default [
     ],
   },
   {
-    input: (await globby("src/client/*.js"))
-      .concat(await globby("src/client/components/*.js"))
-      .reduce(
-        (acc, entryFile) => ({
-          ...acc,
-          [entryFile.replace(".js", "")]: entryFile,
-        }),
-        {}
-      ),
+    input: (await globby("src/client/**/*.js")).reduce(
+      (acc, entryFile) => ({
+        ...acc,
+        [entryFile.replace(".js", "")]: entryFile,
+      }),
+      {}
+    ),
     output: {
       dir: "public",
       format: "esm",
