@@ -8,7 +8,7 @@ A site informing about the setup can be found [here](https://rsc-setup.netlify.a
 
 ## How to create a project with this setup.
 
-1. Type **_npx create-rsc-app name-of-your-app --ssr_** in a terminal window.
+1. Type **_npx create-rsc-app@latest name-of-your-app --ssr_** in a terminal window.
 2. Type **_cd name-of-your-app_**.
 
 ## How to run the project for development.
@@ -84,7 +84,7 @@ const Router = async ({ componentName, props }) => {
     case "":
       return (
         <RCC __isClient__="components/theme-provider" theme={theme}>
-          <RCC __isClient__="slices">
+          <RCC __isClient__="atoms">
             <RCC __isClient__="components/layout" title={title}>
               <RCC __isClient__="components/app" />
             </RCC>
@@ -106,35 +106,98 @@ The `Router` RSC handles the calls from the client and delivers content.
 And how we fetch the server from the client? We use a special RCC named `RSC`. This is its definition:
 
 ```javascript
-import React, { useEffect, useState } from "react";
+import React, { useMemo, Suspense } from "react";
 import { fillJSXWithClientComponents, parseJSX } from "../utils/index.js";
+import { usePropsChangedKey } from "../hooks/use-props-changed-key.js";
+import useSWR from "swr";
 
-export default function RSC({
-  componentName,
+const Error = ({ errorMessage }) => <>Something went wrong: {errorMessage}</>;
+
+const fetcher = (componentName, body) =>
+  fetch(`/${componentName}`, {
+    method: "post",
+    headers: { "content-type": "application/json" },
+    body,
+  })
+    .then((response) => response.text())
+    .then((clientJSXString) => {
+      const clientJSX = JSON.parse(clientJSXString, parseJSX);
+      return fillJSXWithClientComponents(clientJSX);
+    })
+    .catch((error) => {
+      return <Error errorMessage={error.message} />;
+    });
+
+const getReader = () => {
+  let done = false;
+  let promise = null;
+  let value;
+  return {
+    read: (fetcher) => {
+      if (done) {
+        return value;
+      }
+      if (promise) {
+        throw promise;
+      }
+      promise = new Promise(async (resolve) => {
+        try {
+          value = await fetcher();
+        } catch (e) {
+          value = errorJSX;
+        } finally {
+          done = true;
+          promise = null;
+          resolve();
+        }
+      });
+
+      throw promise;
+    },
+  };
+};
+
+const Read = ({ fetcher, reader }) => {
+  return reader.read(fetcher);
+};
+
+const ReadSWR = ({ swrArgs, fetcher }) => {
+  return useSWR(swrArgs, fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    suspense: true,
+  }).data;
+};
+
+export function RSC({
+  componentName = "__no_component_name__",
   children = <>loading ...</>,
-  errorJSX = <>something went wrong</>,
+  softKey,
+  isSWR = false,
   ...props
 }) {
-  const [JSX, setJSX] = useState(children);
-  const body = JSON.stringify({ props });
+  const propsChangedKey = usePropsChangedKey(...Object.values(props));
+  const body = useMemo(() => {
+    return JSON.stringify({ props });
+  }, [propsChangedKey]);
 
-  useEffect(() => {
-    setJSX(children);
-    fetch(`/${componentName}`, {
-      method: "post",
-      headers: { "content-type": "application/json" },
-      body,
-    })
-      .then(async (response) => {
-        const clientJSXString = await response.text();
-        const clientJSX = JSON.parse(clientJSXString, parseJSX);
-        const fixedClientJSX = await fillJSXWithClientComponents(clientJSX);
-        setJSX(fixedClientJSX);
-      })
-      .catch(() => setJSX(errorJSX));
-  }, [componentName, body]);
+  const reader = useMemo(() => getReader(), [propsChangedKey, softKey]);
 
-  return JSX;
+  const fetcherSWR = ([, componentName, body]) => fetcher(componentName, body);
+  const swrArgs = useMemo(
+    () => [softKey, componentName, body],
+    [componentName, body, softKey]
+  );
+
+  return (
+    <Suspense fallback={children}>
+      {isSWR ? (
+        <ReadSWR swrArgs={swrArgs} fetcher={fetcherSWR} />
+      ) : (
+        <Read fetcher={() => fetcher(componentName, body)} reader={reader} />
+      )}
+    </Suspense>
+  );
 }
 ```
 
@@ -223,11 +286,7 @@ export default async function Router({ componentName, props }) {
 }
 ```
 
-The call to `RSC` RCC from any RCC is like a barrier for the flow of props which are functions, because functions cannot be stringified. So in this case use [react-context-slices](https://react-context-slices.github.io/) to set the function into the global shared state and then recover its value down in the tree of RCC's, bypassing in this way the barrier that `RSC` RCC's are for this type of values (functions).
-
-## React.Suspense not implemented
-
-React.Suspense is not implemented in this setup so don't use it (you will get an error or exception thrown). But in theory you don't need it, with the use of `RSC` RCC that fetches the server. If I am wrong about this point let me know.
+The call to `RSC` RCC from any RCC is like a barrier for the flow of props which are functions, because functions cannot be stringified. So in this case use [jotai-wrapper](https://www.npmjs.com/package/jotai-wrapper) to set the function into the global shared state and then recover its value down in the tree of RCC's, bypassing in this way the barrier that `RSC` RCC's are for this type of values (functions).
 
 ## You can eject the project
 
