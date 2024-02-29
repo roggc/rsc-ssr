@@ -7,6 +7,8 @@ import replace from "@rollup/plugin-replace";
 import { globby } from "globby";
 import alias from "@rollup/plugin-alias";
 import image from "@rollup/plugin-image";
+import del from "rollup-plugin-delete";
+import includePaths from "rollup-plugin-includepaths";
 
 const distInputEntries = {
   index: "src/server/index.js",
@@ -30,15 +32,6 @@ export default [
     },
     plugins: [
       babel({ babelHelpers: "bundled", exclude: "node_modules/**" }),
-      // alias({
-      //   entries: [
-      //     {
-      //       find: "styled-components",
-      //       replacement:
-      //         "../../../node_modules/styled-components/dist/styled-components.esm.js",
-      //     },
-      //   ],
-      // }),
       peerDepsExternal(),
       nodeResolve({ resolveOnly: ["rsc-ssr-module", "styled-components"] }),
       json(),
@@ -46,6 +39,8 @@ export default [
         "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
       }),
       image(),
+      del({ targets: "dist/*" }),
+      includePaths({ paths: ["./"] }),
     ],
   },
   {
@@ -83,6 +78,8 @@ export default [
         "process.env.NODE_ENV": JSON.stringify("development"),
       }),
       image(),
+      del({ targets: "public/*" }),
+      includePaths({ paths: ["./"] }),
     ],
     onwarn: function (warning, handler) {
       // Skip certain warnings
