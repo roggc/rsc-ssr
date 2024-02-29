@@ -10,7 +10,7 @@ const Router = async ({ componentName, props }) => {
     case "":
       return (
         <RCC __isClient__="components/theme-provider" theme={theme}>
-          <RCC __isClient__="slices">
+          <RCC __isClient__="atoms">
             <RCC __isClient__="components/layout" title={title}>
               <RCC __isClient__="components/app" />
             </RCC>

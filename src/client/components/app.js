@@ -1,49 +1,42 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import imgReact from "../assets/react.png";
+import imgReact from "src/client/assets/react.png";
 import Image from "./image";
 import { RSC } from "rsc-ssr-module/client";
-import { useSlice } from "../slices";
+import { useAtom } from "src/client/atoms";
 
 export default function App() {
-  const [count, setCount] = useState(0);
-  const [count1, setCount1] = useSlice("count1");
-  const [count2, reduxDispatch, { increment }] = useSlice("count2");
+  const [softKey, setSoftKey] = useState(0);
+  const [counter, setCounter] = useAtom("counter");
 
   return (
     <Container>
       <Title>RSC + SSR</Title>
       <Image src={imgReact} maxWidth="600px" borderRadius="10px" />
       <Div>
-        {" "}
-        <button onClick={() => setCount((c) => c + 1)}>
+        <button onClick={() => setSoftKey((sK) => sK + 1)}>
           get Greeting of the Day (from server)
         </button>
-        {count > 0 && (
-          <RSC componentName="greeting" key={count}>
+        {softKey > 0 && (
+          <RSC componentName="greeting" softKey={softKey}>
             loading greeting ...
           </RSC>
         )}
       </Div>
       <Counters>
         <div>
-          <button onClick={() => setCount1((c) => c + 1)}>+</button>
-          {count1}
-        </div>
-        <div>
-          <button onClick={() => reduxDispatch(increment())}>+</button>
-          {count2}
+          <button onClick={() => setCounter((c) => c + 1)}>+</button>
+          {counter}
         </div>
       </Counters>
       <Div>
         This is a setup for RSC (React Server Components) plus SSR (Server Side
-        Rendering) development.
+        Rendering) development. It has been bootstrapped with{" "}
+        <strong>npx create-rsc-app@latest my-app --ssr</strong>.
       </Div>
       <Div>
-        Another setup for RSC development without SSR can be found{" "}
-        <a href="https://github.com/roggc/rsc" target="_blank">
-          here
-        </a>
+        Another setup for RSC development without SSR can be bootstrapped with{" "}
+        <strong>npx create-rsc-app@latest my-app</strong>.
       </Div>
       <Div>
         It has included{" "}
@@ -51,11 +44,10 @@ export default function App() {
           styled-components
         </a>{" "}
         and{" "}
-        <a href="https://react-context-slices.github.io/" target="_blank">
-          react-context-slices
+        <a href="https://www.npmjs.com/package/jotai-wrapper" target="_blank">
+          jotai-wrapper
         </a>
-        , a library to manage state that seamlessly integrates both Redux and
-        React Context with zero-boilerplate
+        , a tiny library around jotai to manage global state.
       </Div>
       <Div>
         With this setup you can build SPA's with secret keys to fetch an API
