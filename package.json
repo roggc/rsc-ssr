@@ -36,7 +36,7 @@
     "rollup-plugin-delete": "^2.0.0",
     "rollup-plugin-includepaths": "^0.2.4",
     "rollup-plugin-peer-deps-external": "^2.2.4",
-    "rsc-ssr-module": "^4.0.3",
+    "rsc-ssr-module": "^4.0.4",
     "styled-components": "^6.0.8"
   },
   "devDependencies": {
